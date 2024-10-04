@@ -36,13 +36,10 @@
        when: dangling_images.stdout_lines | length > 0
 
      - name: Build Docker image
-       docker_image:
-         path: .
-         name: "{{ docker_username }}/my-python-app1"
-         tag: latest
+       command: docker build --no-cache -t {{ docker_username }}/my-python-app1:latest .
 
      - name: Run tests in Docker
-       command: docker run --rm {{ docker_username }}/my-python-app1:latest pytest
+       command: docker run --rm {{ docker_username }}/my-python-app1:latest pytest -q
        register: pytest_result
 
      - name: Display pytest results
