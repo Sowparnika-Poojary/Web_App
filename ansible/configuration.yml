@@ -1,6 +1,7 @@
 - hosts: dev
   become: yes
   vars:
+    ansible_host: "3.109.60.102"
     docker_image: "{{ docker_username }}/my-python-app1:latest"
   
   tasks:
@@ -82,6 +83,7 @@
 - hosts: prod
   become: yes
   vars:
+    ansible_host: "43.204.19.240"
     docker_image: "{{ docker_username }}/my-python-app1:latest"
 
   tasks:
