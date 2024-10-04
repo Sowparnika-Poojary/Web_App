@@ -41,6 +41,20 @@
          name: "{{ docker_username }}/my-python-app1"
          tag: latest
 
+     - name: Run tests in Docker
+       command: docker run --rm {{ docker_username }}/my-python-app1:latest pytest
+       register: pytest_result
+
+    - name: Display pytest results
+      debug:
+        var: pytest_result.stdout_lines
+
+    - name: Assert pytest passed
+      assert:
+        that:
+          - pytest_result.rc == 0
+        fail_msg: "Pytest failed with return code {{ pytest_result.rc }}."    
+
      - name: Log in to Docker Hub
        docker_login:
          username: "{{ docker_username }}"
