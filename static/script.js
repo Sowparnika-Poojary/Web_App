@@ -3,7 +3,7 @@ document.getElementById('greetButton').addEventListener('click', function () {
     const greetingMessage = document.getElementById('greetingMessage');
 
     if (name) {
-        greetingMessage.textContent = `Hello, ${name}! Have a nice day!`;
+        greetingMessage.textContent = `Hello, ${name}! Have a wonderful day!`;
     } else {
         greetingMessage.textContent = 'Please enter your name.';
     }
