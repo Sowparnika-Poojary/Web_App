@@ -53,7 +53,7 @@ jobs:
               echo "Ansible is already installed."
             fi
 
-            ansible-playbook -i ansible/configuration.yml
+            ansible-playbook ansible/configuration.yml
 
       - name: Deploy to PROD EC2
         uses: appleboy/ssh-action@master
@@ -89,4 +89,4 @@ jobs:
               echo "Ansible is already installed."
             fi
 
-            ansible-playbook -i ansible/configuration.yml
+            ansible-playbook ansible/configuration.yml
