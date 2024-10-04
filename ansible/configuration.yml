@@ -31,9 +31,10 @@
         path: .
         name: "{{ docker_image }}"
         tag: latest
-   - name: Run tests in Docker
-      command: docker run --rm {{ docker_image }} pytest -q
-      register: pytest_result
+        
+    - name: Run tests in Docker
+       command: docker run --rm {{ docker_image }} pytest -q
+       register: pytest_result
 
     - name: Assert pytest passed
       assert:
