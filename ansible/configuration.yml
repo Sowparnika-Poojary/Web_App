@@ -1,149 +1,131 @@
 - hosts: dev
   become: yes
+  vars:
+    docker_image: "{{ docker_username }}/my-python-app1:latest"
+  
   tasks:
-     - name: Update apt package index
-       apt:
-         update_cache: yes
+    - name: Update apt package index and install Docker if not installed
+      apt:
+        update_cache: yes
+        name: docker.io
+        state: present
 
-     - name: Check if Docker is installed
-       command: docker --version
-       register: docker_installed
-       ignore_errors: yes
+    - name: Verify Docker installation
+      command: docker --version
+      register: docker_version
 
-     - name: Install Docker if not installed
-       apt:
-         name: docker.io
-         state: present
-       when: docker_installed is failed
+    - debug:
+        msg: "Docker version: {{ docker_version.stdout }}"
 
-     - name: Verify Docker installation
-       command: docker --version
-       register: docker_version
-    
-     - debug:
-         msg: 
-           - "Docker version: {{ docker_version.stdout }}"
+    - name: Remove old dangling images
+      command: docker images --filter "reference={{ docker_image }}" --filter "dangling=true" -q
+      register: dangling_images
+      ignore_errors: true
 
-     - name: Remove old images with the same name and no tags
-       command: >
-         docker images --filter "reference={{ docker_username }}/my-python-app1" --filter "dangling=true" -q
-       register: dangling_images
-       ignore_errors: true
+    - name: Remove dangling images
+      command: docker rmi {{ item }}
+      with_items: "{{ dangling_images.stdout_lines }}"
+      when: dangling_images.stdout_lines | length > 0
 
-     - name: Remove dangling images
-       command: docker rmi {{ item }}
-       with_items: "{{ dangling_images.stdout_lines }}"
-       when: dangling_images.stdout_lines | length > 0
+    - name: Build Docker image
+      docker_image:
+        path: .
+        name: "{{ docker_image }}"
+        tag: latest
 
-     - name: Build Docker image
-       command: docker build --no-cache -t {{ docker_username }}/my-python-app1:latest .
+    - name: Run tests in Docker
+      command: docker run --rm {{ docker_image }} pytest -q
+      register: pytest_result
 
-     - name: Run tests in Docker
-       command: docker run --rm {{ docker_username }}/my-python-app1:latest pytest -q
-       register: pytest_result
+    - name: Assert pytest passed
+      assert:
+        that:
+          - pytest_result.rc == 0
+        fail_msg: "Pytest failed with return code {{ pytest_result.rc }}."
 
-     - name: Display pytest results
-       debug:
-         var: pytest_result.stdout_lines
+    - name: Log in to Docker Hub
+      docker_login:
+        username: "{{ docker_username }}"
+        password: "{{ docker_hub_access_token }}"
 
-     - name: Assert pytest passed
-       assert:
-         that:
-           - pytest_result.rc == 0
-         fail_msg: "Pytest failed with return code {{ pytest_result.rc }}."    
+    - name: Push the Docker image to Docker Hub
+      docker_image:
+        name: "{{ docker_image }}"
+        push: yes
 
-     - name: Log in to Docker Hub
-       docker_login:
-         username: "{{ docker_username }}"
-         password: "{{ docker_hub_access_token }}"
+    - name: Check if the container exists
+      command: docker ps -a -q -f name=my-python-app1-container
+      register: container_check
+      ignore_errors: true
 
-     - name: Push the Docker image to Docker Hub
-       docker_image:
-         name: "{{ docker_image }}"
-         push: yes
+    - name: Stop existing container if it exists
+      docker_container:
+        name: my-python-app1-container
+        state: stopped
+      when: container_check.stdout != ""
 
-     - name: Check if the container exists
-       command: docker ps -a -q -f name=my-python-app1-container
-       register: container_check
-       ignore_errors: true
+    - name: Remove existing container if it exists
+      docker_container:
+        name: my-python-app1-container
+        state: absent
+      when: container_check.stdout != ""
 
-     - name: Stop existing container if it exists
-       docker_container:
-         name: my-python-app1-container
-         state: stopped
-       when: container_check.stdout != ""
-
-     - name: Remove existing container if it exists
-       docker_container:
-         name: my-python-app1-container
-         state: absent
-       when: container_check.stdout != ""
-
-     - name: Run the Docker container
-       docker_container:
-         name: my-python-app1-container
-         image: "{{ docker_image }}"
-         state: started
-         restart_policy: always
-         published_ports:
-           - "90:5000"      
+    - name: Run the Docker container
+      docker_container:
+        name: my-python-app1-container
+        image: "{{ docker_image }}"
+        state: started
+        restart_policy: always
+        published_ports:
+          - "90:5000"
 
 - hosts: prod
   become: yes
   vars:
     docker_image: "{{ docker_username }}/my-python-app1:latest"
+
   tasks:
-     - name: Update apt package index
-       apt:
-         update_cache: yes
+    - name: Update apt package index and install Docker if not installed
+      apt:
+        update_cache: yes
+        name: docker.io
+        state: present
 
-     - name: Check if Docker is installed
-       command: docker --version
-       register: docker_installed
-       ignore_errors: yes
+    - name: Verify Docker installation
+      command: docker --version
+      register: docker_version
 
-     - name: Install Docker if not installed
-       apt:
-         name: docker.io
-         state: present
-       when: docker_installed is failed
+    - debug:
+        msg: "Docker version: {{ docker_version.stdout }}"
 
-     - name: Verify Docker installation
-       command: docker --version
-       register: docker_version
-    
-     - debug:
-         msg: 
-           - "Docker version: {{ docker_version.stdout }}"
+    - name: Pull the latest Docker image on PROD server
+      docker_image:
+        name: "{{ docker_image }}"
+        tag: latest
+        source: pull
 
-     - name: Pull the latest Docker image on PROD server
-       docker_image:
-         name: "{{ docker_image }}"
-         tag: latest
-         source: pull
+    - name: Check if the container exists
+      command: docker ps -a -q -f name=my-python-app1-container-prod
+      register: prod_container_check
+      ignore_errors: true
 
-     - name: Check if the container exists
-       command: docker ps -a -q -f name=my-python-app1-container-prod
-       register: prod_container_check
-       ignore_errors: true
+    - name: Stop existing container if it exists
+      docker_container:
+        name: my-python-app1-container-prod
+        state: stopped
+      when: prod_container_check.stdout != ""
 
-     - name: Stop existing container if it exists
-       docker_container:
-         name: my-python-app1-container-prod
-         state: stopped
-       when: prod_container_check.stdout != ""
+    - name: Remove existing container if it exists
+      docker_container:
+        name: my-python-app1-container-prod
+        state: absent
+      when: prod_container_check.stdout != ""
 
-     - name: Remove existing container if it exists
-       docker_container:
-         name: my-python-app1-container-prod
-         state: absent
-       when: prod_container_check.stdout != ""
-
-     - name: Run the Docker container on PROD server
-       docker_container:
-         name: my-python-app1-container-prod
-         image: "{{ docker_image }}"
-         state: started
-         restart_policy: always
-         published_ports:
-           - "90:5000"      
+    - name: Run the Docker container on PROD server
+      docker_container:
+        name: my-python-app1-container-prod
+        image: "{{ docker_image }}"
+        state: started
+        restart_policy: always
+        published_ports:
+          - "90:5000"
