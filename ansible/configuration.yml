@@ -2,7 +2,6 @@
   become: yes
   vars:
     docker_image: "{{ docker_username }}/my-python-app1:latest"
-  
   tasks:
     - name: Update apt package index and install Docker if not installed
       apt:
@@ -26,12 +25,12 @@
       command: docker rmi {{ item }}
       with_items: "{{ dangling_images.stdout_lines }}"
       when: dangling_images.stdout_lines | length > 0
-
-     - name: Build Docker image
-       docker_image:
-         path: .
-         name: "{{ docker_image }}"
-         tag: latest
+      
+    - name: Build Docker image
+      docker_image:
+        path: .
+        name: "{{ docker_image }}"
+        tag: latest
 
      - name: Run tests in Docker
        command: docker run --rm {{ docker_image }} pytest -q
