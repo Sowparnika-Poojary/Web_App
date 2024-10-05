@@ -27,6 +27,14 @@
     - name: Build Docker image
       command: docker build -t "{{ docker_username }}/my-python-app1:latest" /home/ubuntu/python-app
         
+    - name: Run pytest in a Docker container
+      command: docker run --rm "{{ docker_username }}/my-python-app1:latest" pytest
+      register: result
+
+    - name: Display test results
+      debug:
+        var: result.stdout  
+
     - name: Log in to Docker Hub
       docker_login:
         username: "{{ docker_username }}"
