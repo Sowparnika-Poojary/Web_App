@@ -26,11 +26,11 @@
       
     - name: Build Docker image
       docker_image:
-        path: home/ubuntu/python-app
+        path: /home/ubuntu/python-app
         name: "{{ docker_username }}/my-python-app1:latest"
         tag: latest
         state: present
-        build: yes
+        source: build
         
     - name: Log in to Docker Hub
       docker_login:
