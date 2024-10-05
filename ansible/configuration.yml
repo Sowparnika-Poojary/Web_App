@@ -27,9 +27,10 @@
     - name: Build Docker image
       docker_image:
         path: /home/ubuntu/python-app  # Directory containing the Dockerfile
-        name: "{{ docker_username }}/my-python-app1:latest"
+        name: "sowparnika268/my-python-app1:latest"
         tag: latest
         state: present
+        build: yes
         
     - name: Log in to Docker Hub
       docker_login:
