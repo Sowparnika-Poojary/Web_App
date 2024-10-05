@@ -27,39 +27,41 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            if ! command -v git &> /dev/null; then
+             # Add the host key to known_hosts
+             ssh-keyscan -H ${{ secrets.DEV_IP_ADDRESS }} >> ~/.ssh/known_hosts
+          
+             if ! command -v git &> /dev/null; then
               echo "Git not found, installing..."
               sudo apt-get update
               sudo apt-get install -y git
-            else
+             else
               echo "Git is already installed."
-            fi
-          
-            # Navigate to the app directory or clone the repository if it doesn't exist
-            if [ ! -d "/home/ubuntu/python-app" ]; then
+             fi
+             # Navigate to the app directory or clone the repository if it doesn't exist
+             if [ ! -d "/home/ubuntu/python-app" ]; then
               git clone https://github.com/Sowparnika-Poojary/Web_App.git /home/ubuntu/python-app
-            fi
+             fi
             
-            cd /home/ubuntu/python-app
+             cd /home/ubuntu/python-app
             
-            # Pull latest changes
-            git pull
+             # Pull latest changes
+             git pull
 
-            if ! command -v ansible &> /dev/null; then
+             if ! command -v ansible &> /dev/null; then
               echo "Ansible not found, installing..."
               sudo apt-get update
               sudo apt-get install -y ansible
-            else
+             else
               echo "Ansible is already installed."
-            fi
+             fi
 
-            # Install Docker module if not installed
-            if ! ansible-galaxy collection list | grep community.docker; then
+             # Install Docker module if not installed
+             if ! ansible-galaxy collection list | grep community.docker; then
               echo "Installing community.docker collection..."
               ansible-galaxy collection install community.docker
-            fi
+             fi
 
-            ansible-playbook -i /home/ubuntu/python-app/ansible/hosts.ini /home/ubuntu/python-app/ansible/configuration.yml 
+             ansible-playbook -i /home/ubuntu/python-app/ansible/hosts.ini /home/ubuntu/python-app/ansible/configuration.yml 
 
       - name: Deploy to PROD EC2
         uses: appleboy/ssh-action@master
