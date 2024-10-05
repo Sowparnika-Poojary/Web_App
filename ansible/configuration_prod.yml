@@ -1,0 +1,44 @@
+- hosts: prod
+  become: yes
+  tasks:
+    - name: Update apt package index and install Docker if not installed
+      apt:
+        update_cache: yes
+        name: docker.io
+        state: present
+
+    - name: Verify Docker installation
+      command: docker --version
+      register: docker_version
+
+    - debug:
+        msg: "Docker version: {{ docker_version.stdout }}"
+
+    - name: Pull the latest Docker image on PROD server
+      command: docker pull "{{ docker_username }}/my-python-app1:latest"
+
+    - name: Check if the container exists
+      command: docker ps -a -q -f name=my-python-app1-container-prod
+      register: prod_container_check
+      ignore_errors: true
+
+    - name: Stop existing container if it exists
+      docker_container:
+        name: my-python-app1-container-prod
+        state: stopped
+      when: prod_container_check.stdout != ""
+
+    - name: Remove existing container if it exists
+      docker_container:
+        name: my-python-app1-container-prod
+        state: absent
+      when: prod_container_check.stdout != ""
+
+    - name: Run the Docker container on PROD server
+      docker_container:
+        name: my-python-app1-container-prod
+        image: "{{ docker_username }}/my-python-app1:latest"
+        state: started
+        restart_policy: always
+        published_ports:
+          - "90:5000"
