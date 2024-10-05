@@ -25,12 +25,7 @@
       when: dangling_images.stdout_lines | length > 0
       
     - name: Build Docker image
-      docker_image:
-        path: /home/ubuntu/python-app  # Directory containing the Dockerfile
-        name: "sowparnika268/my-python-app1:latest"
-        tag: latest
-        state: present
-        build: yes
+      command: docker build -t "{{ docker_username }}/my-python-app1:latest" /home/ubuntu/python-app
         
     - name: Log in to Docker Hub
       docker_login:
