@@ -30,7 +30,7 @@
     - name: Log in to Docker Hub
       docker_login:
         username: "{{ docker_username }}"
-        password: "{{ docker_hub_access_token }}"
+        password: "{{ docker_password }}"
 
     - name: Push the Docker image to Docker Hub
       docker_image:
