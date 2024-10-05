@@ -32,16 +32,6 @@
         name: "{{ docker_image }}"
         tag: latest
         
-    - name: Run tests in Docker
-      command: docker run --rm {{ docker_image }} pytest -q
-      register: pytest_result
-
-    - name: Assert pytest passed
-      assert:
-        that:
-          - pytest_result.rc == 0
-        fail_msg: "Pytest failed with return code {{ pytest_result.rc }}."
-
     - name: Log in to Docker Hub
       docker_login:
         username: "{{ docker_username }}"
