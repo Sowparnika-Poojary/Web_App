@@ -1,6 +1,11 @@
 # tests/test_app.py
-
+import sys
+import os
 import pytest
+
+# Add the parent directory to the Python path for module resolution
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from app import app  # Import your Flask app
 
 @pytest.fixture
