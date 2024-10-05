@@ -28,6 +28,9 @@ jobs:
           port: 22
           script: |
              # Add the host key to known_hosts
+             mkdir -p ~/.ssh
+             echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+             chmod 600 ~/.ssh/id_ed25519
              ssh-keyscan -H ${{ secrets.DEV_IP_ADDRESS }} >> ~/.ssh/known_hosts
           
              if ! command -v git &> /dev/null; then
@@ -71,6 +74,12 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
+            # Add the host key to known_hosts
+            mkdir -p ~/.ssh
+            echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+            chmod 600 ~/.ssh/id_ed25519
+            ssh-keyscan -H ${{ secrets.PROD_IP_ADDRESS }} >> ~/.ssh/known_hosts
+            
             if ! command -v git &> /dev/null; then
               echo "Git not found, installing..."
               sudo apt-get update
