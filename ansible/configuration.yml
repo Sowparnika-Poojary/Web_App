@@ -30,7 +30,7 @@
         name: "{{ docker_username }}/my-python-app1:latest"
         tag: latest
         state: present
-        source: build
+        build: yes
         
     - name: Log in to Docker Hub
       docker_login:
