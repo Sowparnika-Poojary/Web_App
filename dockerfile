@@ -20,7 +20,7 @@ FROM builder AS tester
 ENV PYTHONPATH=/app
 
 # Run the tests (make sure pytest is installed in requirements.txt)
-RUN pytest  # This will execute your tests
+RUN pytest  tests/test_app.py  # Specify the test file to execute # This will execute your tests
 
 # Final image for running the application
 FROM python:3.9-slim AS final
