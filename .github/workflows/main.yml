@@ -53,6 +53,12 @@ jobs:
               echo "Ansible is already installed."
             fi
 
+            # Install Docker module if not installed
+            if ! ansible-galaxy collection list | grep community.docker; then
+              echo "Installing community.docker collection..."
+              ansible-galaxy collection install community.docker
+            fi
+
             ansible-playbook -i ansible/hosts ansible/configuration.yml 
 
       - name: Deploy to PROD EC2
