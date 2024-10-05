@@ -32,6 +32,7 @@
         name: "{{ docker_image }}"
         tag: latest
         state: present
+        source: build
         
     - name: Log in to Docker Hub
       docker_login:
