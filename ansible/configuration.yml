@@ -26,7 +26,7 @@
       
     - name: Build Docker image
       docker_image:
-        path: .
+        path: home/ubuntu/python-app
         name: "{{ docker_username }}/my-python-app1:latest"
         tag: latest
         state: present
