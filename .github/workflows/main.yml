@@ -59,7 +59,7 @@ jobs:
               ansible-galaxy collection install community.docker
             fi
 
-            ansible-playbook -i ansible/hosts ansible/configuration.yml 
+            ansible-playbook -i /home/ubuntu/python-app/ansible/hosts.ini /home/ubuntu/python-app/ansible/configuration.yml 
 
       - name: Deploy to PROD EC2
         uses: appleboy/ssh-action@master
@@ -95,4 +95,4 @@ jobs:
               echo "Ansible is already installed."
             fi
 
-            ansible-playbook -i ansible/hosts ansible/configuration.yml
+            ansible-playbook -i /home/ubuntu/python-app/ansible/hosts.ini /home/ubuntu/python-app/ansible/configuration.yml
