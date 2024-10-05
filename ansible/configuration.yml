@@ -1,7 +1,5 @@
 - hosts: dev
   become: yes
-  vars:
-    docker_image: "{{ docker_username }}/my-python-app1:latest"
   tasks:
     - name: Update apt package index and install Docker if not installed
       apt:
@@ -17,7 +15,7 @@
         msg: "Docker version: {{ docker_version.stdout }}"
 
     - name: Remove old dangling images
-      command: docker images --filter "reference={{ docker_image }}" --filter "dangling=true" -q
+      command: docker images --filter "reference={{ docker_username }}/my-python-app1:latest" --filter "dangling=true" -q
       register: dangling_images
       ignore_errors: true
 
@@ -28,8 +26,8 @@
       
     - name: Build Docker image
       docker_image:
-        path: /home/ubuntu/python-app
-        name: "{{ docker_image }}"
+        path: .
+        name: "{{ docker_username }}/my-python-app1:latest"
         tag: latest
         state: present
         source: build
@@ -41,7 +39,7 @@
 
     - name: Push the Docker image to Docker Hub
       docker_image:
-        name: "{{ docker_image }}"
+        name: "{{ docker_username }}/my-python-app1:latest"
         push: yes
 
     - name: Check if the container exists
@@ -64,7 +62,7 @@
     - name: Run the Docker container
       docker_container:
         name: my-python-app1-container
-        image: "{{ docker_image }}"
+        image: "{{ docker_username }}/my-python-app1:latest"
         state: started
         restart_policy: always
         published_ports:
@@ -72,9 +70,6 @@
 
 - hosts: prod
   become: yes
-  vars:
-    docker_image: "{{ docker_username }}/my-python-app1:latest"
-
   tasks:
     - name: Update apt package index and install Docker if not installed
       apt:
@@ -91,7 +86,7 @@
 
     - name: Pull the latest Docker image on PROD server
       docker_image:
-        name: "{{ docker_image }}"
+        name: "{{ docker_username }}/my-python-app1:latest"
         tag: latest
         source: pull
 
@@ -115,7 +110,7 @@
     - name: Run the Docker container on PROD server
       docker_container:
         name: my-python-app1-container-prod
-        image: "{{ docker_image }}"
+        image: "{{ docker_username }}/my-python-app1:latest"
         state: started
         restart_policy: always
         published_ports:
