@@ -64,6 +64,9 @@ jobs:
               ansible-galaxy collection install community.docker
              fi
 
+             echo "docker_username=${{ secrets.DOCKER_HUB_USERNAME }}" >> $GITHUB_ENV
+             echo "docker_password=${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" >> $GITHUB_ENV
+
              ansible-playbook -i /home/ubuntu/python-app/ansible/hosts.ini /home/ubuntu/python-app/ansible/configuration_dev.yml 
 
       - name: Deploy to PROD EC2
@@ -105,5 +108,8 @@ jobs:
             else
               echo "Ansible is already installed."
             fi
+
+            echo "docker_username=${{ secrets.DOCKER_HUB_USERNAME }}" >> $GITHUB_ENV
+            echo "docker_password=${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" >> $GITHUB_ENV
 
             ansible-playbook -i /home/ubuntu/python-app/ansible/hosts.ini /home/ubuntu/python-app/ansible/configuration_prod.yml
