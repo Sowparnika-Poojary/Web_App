@@ -64,6 +64,7 @@ jobs:
               ansible-galaxy collection install community.docker
              fi
 
+             echo "DEV_IP_ADDRESS=${{ secrets.DEV_IP_ADDRESS }}" >> $GITHUB_ENV
              echo "docker_username=${{ secrets.DOCKER_HUB_USERNAME }}" >> $GITHUB_ENV
              echo "docker_password=${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" >> $GITHUB_ENV
 
@@ -109,6 +110,7 @@ jobs:
               echo "Ansible is already installed."
             fi
 
+            echo "PROD_IP_ADDRESS=${{ secrets.PROD_IP_ADDRESS }}" >> $GITHUB_ENV
             echo "docker_username=${{ secrets.DOCKER_HUB_USERNAME }}" >> $GITHUB_ENV
             echo "docker_password=${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" >> $GITHUB_ENV
 
