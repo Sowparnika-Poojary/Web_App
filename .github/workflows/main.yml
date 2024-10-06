@@ -64,11 +64,7 @@ jobs:
               ansible-galaxy collection install community.docker
              fi
 
-             echo "DEV_IP_ADDRESS=${{ secrets.DEV_IP_ADDRESS }}" >> $GITHUB_ENV
-             echo "docker_username=${{ secrets.DOCKER_HUB_USERNAME }}" >> $GITHUB_ENV
-             echo "docker_password=${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" >> $GITHUB_ENV
-
-             ansible-playbook -i /home/ubuntu/python-app/ansible/hosts.ini /home/ubuntu/python-app/ansible/configuration_dev.yml 
+             ansible-playbook -i /home/ubuntu/python-app/ansible/hosts.ini /home/ubuntu/python-app/ansible/configuration_dev.yml -e "docker_username=$DOCKER_HUB_USERNAME" -e "docker_password=$DOCKER_HUB_ACCESS_TOKEN"
 
       - name: Deploy to PROD EC2
         uses: appleboy/ssh-action@master
@@ -110,8 +106,4 @@ jobs:
               echo "Ansible is already installed."
             fi
 
-            echo "PROD_IP_ADDRESS=${{ secrets.PROD_IP_ADDRESS }}" >> $GITHUB_ENV
-            echo "docker_username=${{ secrets.DOCKER_HUB_USERNAME }}" >> $GITHUB_ENV
-            echo "docker_password=${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" >> $GITHUB_ENV
-
-            ansible-playbook -i /home/ubuntu/python-app/ansible/hosts.ini /home/ubuntu/python-app/ansible/configuration_prod.yml
+            ansible-playbook -i /home/ubuntu/python-app/ansible/hosts.ini /home/ubuntu/python-app/ansible/configuration_prod.yml -e "docker_username=$DOCKER_HUB_USERNAME" -e "docker_password=$DOCKER_HUB_ACCESS_TOKEN"
