@@ -25,7 +25,7 @@
       when: dangling_images.stdout_lines | length > 0
       
     - name: Build Docker image
-      command: docker build -t "{{ docker_username }}/my-python-app1:latest" /home/ubuntu/python-app
+      shell: docker build -t "{{ docker_username }}/my-python-app1:latest" /home/ubuntu/python-app
         
     - name: Run pytest in a Docker container
       command: docker run --rm "{{ docker_username }}/my-python-app1:latest" pytest
