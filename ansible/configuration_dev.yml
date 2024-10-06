@@ -1,5 +1,8 @@
 - hosts: dev
   become: yes
+  vars:
+    docker_username: "{{ lookup('env', 'docker_username') }}"
+    docker_password: "{{ lookup('env', 'docker_password') }}"
   tasks:
     - name: Update apt package index and install Docker if not installed
       apt:
