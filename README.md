@@ -63,10 +63,10 @@ o	The workflow logs into Docker Hub using the credentials stored in GitHub Secre
 o	This job uses appleboy/ssh-action@master to SSH into the development EC2 instance.
 o	It installs Git and Ansible if they are not already installed.
 o	The script checks if the application directory exists. If it does not, it clones the repository.
-o	It then pulls the latest changes and executes the Ansible playbook for the development configuration (configuration_dev.yml).
-4.	Deploy to Production EC2:
+o	It then pulls the latest changes and executes the Ansible playbook for the development configuration (configuration_dev.yml).Passes the Docker Hub username, dockerhub password as an extra variable to the playbook.
+5.	Deploy to Production EC2:
 o	Similar to the development job, this job connects to the production EC2 instance.
-o	It performs the same checks and operations: installs Git and Ansible, clones the repository if needed, and executes the Ansible playbook for the production configuration (configuration_prod.yml).
+o	It performs the same checks and operations: installs Git and Ansible, clones the repository if needed, and executes the Ansible playbook for the production configuration (configuration_prod.yml). Passes the Docker Hub username, dockerhub password as an extra variable to the playbook.
 Secrets 
 Ensure that the following secrets are set in your GitHub repository settings under "Secrets" for this workflow to run successfully:
 •	DOCKER_HUB_USERNAME: Your Docker Hub username.
@@ -148,8 +148,6 @@ Structure of inventory file
 •	ansible_host: The actual IP address of the production EC2 instance.
 •  Global Variables: This section defines variables that apply to all hosts.
 •	ansible_user=ubuntu: The default user to connect to the servers via SSH
-•	docker_username: Your Docker Hub username 
-•	docker_password: Your Docker Hub password 
 
 Test file structure
 •  Importing Dependencies:
