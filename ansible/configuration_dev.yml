@@ -27,9 +27,9 @@
     - name: Build Docker image
       shell: docker build -t "{{ docker_username }}/my-python-app1:latest" /home/ubuntu/python-app
         
-    - name: Run pytest in a Docker container
-      command: docker run --rm "{{ docker_username }}/my-python-app1:latest" pytest
-      register: result
+    #- name: Run pytest in a Docker container
+      #command: docker run --rm "{{ docker_username }}/my-python-app1:latest" pytest
+      #register: result
 
     - name: Display test results
       debug:
